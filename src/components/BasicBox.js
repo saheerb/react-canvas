@@ -4,31 +4,43 @@ import {Text, TextInput, View, StyleSheet, Button} from "react-native"
 
 
 export default class BasicBox extends Component {
-    constructor() {
-        super();
-        //this.result=[]
+    constructor(props) {
+        super(props);
+        this.curserPosition = this.props.result_box_count - 1
         this.state = {
-            result: ["","","",""]
+            result: Array(this.props.result_box_count).fill("")
         };
     }
 
     setInputValue = (txt, index) => {
-        console.log(txt)
-        console.log("State: "+this.state.result);
-        console.log("Txt: "+txt);
-        console.log("index: "+index);
         var result=this.state.result;
         result[index]=txt;
+        this.curserPosition = index -1 
         this.setState({result:result})
     }
 
+    setFocus = (input, index) => {
+      console.log("set focus: "+ this.curserPosition + ": "+index)
+      index === this.curserPosition ? input.focus():null
+    }
+
     resetInputValue = (index) => {
-        // console.log(index)
-        console.log("State: "+this.state.result);
-        // console.log("Txt: "+txt);
+        console.log("Reset Input value: "+index)
+        if (this.state.result[index] == "")
+            return
+            
         var result=this.state.result;
         result[index]="";
+        
+        console.log("Reset1: "+this.curserPosition)
         this.setState({result:result})
+        this.curserPosition = index
+    }
+
+    resetResult = () => {
+        console.log("Rest Result: ")
+        this.curserPosition = this.props.result_box_count - 1
+        this.setState({result:Array(this.props.result_box_count).fill("")})
     }
 
     createTable = (number) => {
@@ -45,9 +57,12 @@ export default class BasicBox extends Component {
         
         let texts = []
         digits.reverse().map((value, index) => {
-            texts.push(<Text style={styles.digit}>{value}</Text>)
+            texts.push(<Text key={`Number-${number}-${index}`} style={styles.digit}
+                        // onPress={this.resetResult}
+                        >{value}</Text>)
         })
-        table.push(<View style={styles.operand}>{texts}</View>)
+
+        table.push(<View key={`Number-${number}`} style={styles.operand}>{texts}</View>)
 
         return table
     }
@@ -55,24 +70,25 @@ export default class BasicBox extends Component {
     createTextInput = (result_input_count) => {
         let table = []
         let texts = []
-        for (var index=0; index<result_input_count; index++) {
-            // console.log(index)
+        this.state.result.map((value, index) => {
             let inputs =[]
-            // Why index_i needed here? without which index is alway evaluated to 4?
-            const index_i =index
-            inputs.push(<Text id={index_i}  style={styles.digit_hidden} >1</Text>)
-            inputs.push(<TextInput style={styles.digit_answer} 
-                keyboardType='numeric' 
-                maxLength={1}
-                onChangeText={(txt) => this.setInputValue(txt, index_i)}
-                onFocus={() => this.resetInputValue(index_i)}
-                >
-                {this.state.result[index_i]}
-            </TextInput>)
-            texts.push(<View>{inputs}</View>)
-        }
+            // The hidden Text below is created for aligning textinput to text. 
+            // The value is not used anywhere
+            inputs.push(<Text key={`TextInput-Text-${index}`} style={styles.digit_hidden}>1</Text>)
+            inputs.push(<TextInput key={`TextInput-TextInpu-${index}`} style={styles.digit_answer} 
+                        keyboardType='numeric'
+                        maxLength={1}
+                        onChangeText={(txt) => this.setInputValue(txt, index)}
+                        onFocus={() =>this.resetInputValue(index)}
+                        ref={ input =>input && this.setFocus(input, index)}
+                        >
+                        {this.state.result[index]}
+                    </TextInput>)
+            texts.push(<View key={`TextInput-View-${index}`}>{inputs}</View>)
 
-        table.push(<View style={styles.operand}>{texts}</View>)
+        })
+
+        table.push(<View key="TextInput" style={styles.operand}>{texts}</View>)
 
         return table
     }
@@ -91,7 +107,11 @@ export default class BasicBox extends Component {
                 </View>
             </View>
         
-            <Button onPress={()=>{this.props.get_result(this.state.result)}}
+            <Button onPress={()=>{
+                this.resetResult()
+                this.props.get_result(this.state.result)
+                //this.resetResult()
+            }}
                 title="Check Result"
             />
         </View>) 
@@ -102,40 +122,21 @@ export default class BasicBox extends Component {
 const styles = StyleSheet.create ({
     main: {
         flexDirection:"row",
-        // borderWidth:1,
-        // flex: 1,
         justifyContent: "center",
-        // alignItems: "center"
     },
     digit: {
         fontSize: 80,
-        // borderWidth:1,
-        //adjustsFontSizeToFit
     },
     digit_hidden: {
         fontSize: 80,
-        // borderWidth:1,
         flex:1,
-        
-
-        // color: `rgb(255,255,255)`
     },
     operand: {
         flexDirection:"row",
         justifyContent:"flex-end",
-        // alignItems:"flex-end",
-        // borderWidth:1,
     },
     digit_answer: {
-        // alignItems:"baseline",
-        // flexDirection:"row",
-        // justifyContent:"flex-end",
-        
-        // backgroundColor: `rgb(255,255,255)`,
-        
-        // alignItems:"flex-end",
         fontSize: 80,
-        // backgroundColor: gray`rgb(255,255,255)`,
         backgroundColor:'gray',
         borderWidth:1,
     },

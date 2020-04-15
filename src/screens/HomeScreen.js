@@ -5,7 +5,7 @@ const HomeScreen = ({ navigation }) => {
   return (
     <View>
       <Text style={styles.text}>Hi there!</Text>
-      <Button
+      {/* <Button
         onPress={() => navigation.navigate('SignPanel')}
         title="Go to Sign Panel Demo"
       />
@@ -20,7 +20,7 @@ const HomeScreen = ({ navigation }) => {
       <Button
         onPress={() => navigation.navigate('CanvasSketch')}
         title="Go to Canvas Sketch Demo"
-      />
+      /> */}
       <Button
         onPress={() => navigation.navigate('BasicOperation')}
         title="Go to Canvas Math Demo"

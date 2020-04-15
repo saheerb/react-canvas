@@ -31,6 +31,7 @@ export default class example extends Component {
       console.log("Regenerate: ")
       this.generate()
     }
+    // TODO: check if result set is same would it update screen?
     this.setState({result:parseInt(text)})
   }
 
